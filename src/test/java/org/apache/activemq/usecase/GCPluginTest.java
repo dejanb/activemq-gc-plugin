@@ -48,7 +48,7 @@ public class GCPluginTest {
         PolicyEntry entry = new PolicyEntry();
         entry.setGcInactiveDestinations(true);
         entry.setGcWithNetworkConsumers(true);
-        entry.setInactiveTimeoutBeforeGC(3000);
+        entry.setInactiveTimoutBeforeGC(3000);
         PolicyMap map = new PolicyMap();
         map.setDefaultEntry(entry);
         broker.setDestinationPolicy(map);

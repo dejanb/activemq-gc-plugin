@@ -69,7 +69,7 @@ public class GCInactiveDestinationsBroker extends BrokerFilter {
                             context.setBroker(next.getBrokerService().getRegionBroker());
 
                             for (Destination dest : list) {
-                                LOG.info("{} Inactive for longer than {} ms - removing ...", dest.getName(), dest.getInactiveTimeoutBeforeGC());
+                                LOG.info("{} Inactive for longer than {} ms - removing ...", dest.getName(), dest.getInactiveTimoutBeforeGC());
                                 try {
                                     getRoot().removeDestination(context, dest.getActiveMQDestination(), 1);
                                     lastActiveTime.remove(dest);
@@ -95,7 +95,7 @@ public class GCInactiveDestinationsBroker extends BrokerFilter {
     public void markForGC(BaseDestination destination, long timeStamp) {
         Long lastActive = lastActiveTime.get(destination);
         if (destination.isGcIfInactive() && lastActive != null && lastActive == 0 && isActive(destination) == false
-                && destination.getDestinationStatistics().getMessages().getCount() == 0 && destination.getInactiveTimeoutBeforeGC() > 0l) {
+                && destination.getDestinationStatistics().getMessages().getCount() == 0 && destination.getInactiveTimoutBeforeGC() > 0l) {
             lastActiveTime.put(destination, timeStamp);
         }
     }
@@ -104,7 +104,7 @@ public class GCInactiveDestinationsBroker extends BrokerFilter {
         boolean result = false;
         Long lastActive = lastActiveTime.get(destination);
         if (destination.isGcIfInactive()&& lastActive != null && lastActive != 0l) {
-            if ((System.currentTimeMillis() - lastActiveTime.get(destination)) >= destination.getInactiveTimeoutBeforeGC()) {
+            if ((System.currentTimeMillis() - lastActiveTime.get(destination)) >= destination.getInactiveTimoutBeforeGC()) {
                 result = true;
             }
         }
@@ -141,14 +141,14 @@ public class GCInactiveDestinationsBroker extends BrokerFilter {
     @Override
     public Subscription addConsumer(ConnectionContext context, ConsumerInfo info) throws Exception {
         Subscription sub = super.addConsumer(context, info);
-        updateLastActiveTime(next.getDestinationMap(info.getDestination()).values());
+        updateLastActiveTime(next.getDestinations(info.getDestination()));
         return sub;
     }
 
     @Override
     public void addProducer(ConnectionContext context, ProducerInfo info) throws Exception {
         super.addProducer(context, info);
-        updateLastActiveTime(next.getDestinationMap(info.getDestination()).values());
+        updateLastActiveTime(next.getDestinations(info.getDestination()));
     }
 
     protected void updateLastActiveTime(Collection<Destination> destinations) {
